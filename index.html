@@ -402,7 +402,7 @@ font-size:44px;
 
 <div class="btn-group">
 <a href="#productos" class="btn btn-primary">Comprar Ahora</a>
-<a href="#galeria" class="btn btn-secondary">Ver Colección</a>
+<button onclick="document.getElementById('galeria').scrollIntoView({behavior:'smooth'})" class="btn btn-secondary">Ver Colección</button>
 </div>
 </div>
 </section>
@@ -477,7 +477,7 @@ font-size:44px;
 <div class="product-info">
 <h3>Collar Estrella</h3>
 <div class="price">$120 MXN</div>
-<a href="#contacto" class="btn btn-primary">Comprar</a>
+<button class="btn btn-primary" onclick="toggleCarrito()">Comprar</button>
 </div>
 </div>
 
@@ -489,7 +489,7 @@ font-size:44px;
 <div class="product-info">
 <h3>Aretes Perla</h3>
 <div class="price">$95 MXN</div>
-<a href="#contacto" class="btn btn-primary">Comprar</a>
+<button class="btn btn-primary" onclick="toggleCarrito()">Comprar</button>
 </div>
 </div>
 
@@ -501,7 +501,7 @@ font-size:44px;
 <div class="product-info">
 <h3>Pulsera Corazón</h3>
 <div class="price">$140 MXN</div>
-<a href="#contacto" class="btn btn-primary">Comprar</a>
+<button class="btn btn-primary" onclick="toggleCarrito()">Comprar</button>
 </div>
 </div>
 
@@ -570,7 +570,7 @@ font-size:44px;
 
 <div>
 <h3>Contacto</h3>
-<p>📱 WhatsApp: +52 5626248820</p>
+<p>📱 WhatsApp: +52 5626248820 </p>
 <p>📷 Instagram: @margeri.accesorios</p>
 <p>📍 México</p>
 </div>
@@ -711,7 +711,9 @@ contenedor.innerHTML += `
 <div class="product-info">
 <h3>${producto.nombre}</h3>
 <div class="price">$${producto.precio} MXN</div>
-<a class="btn btn-primary" onclick="agregarCarrito(${index})">Agregar al carrito</a>
+<button class="btn btn-primary" onclick="agregarCarrito(${index})">
+Agregar al carrito
+</button>
 </div>
 </div>
 `;
@@ -1001,7 +1003,7 @@ Finalizar Pedido
 
 <input id="adminPassword" type="password" placeholder="Contraseña" style="width:100%;padding:15px;border-radius:15px;border:1px solid #ddd;margin-bottom:20px;">
 
-<button onclick="loginAdminReal()" class="btn btn-primary" style="border:none;cursor:pointer;">
+<button type="button" onclick="loginAdminReal()" class="btn btn-primary" style="border:none;cursor:pointer;">
 Iniciar Sesión
 </button>
 
