@@ -1,23 +1,4 @@
-# Margeri Accesorios — Página Completa Lista para Publicar
-
-Guarda este archivo como:
-
-```txt
-index.html
-```
-
-Luego puedes subirlo a:
-
-* GitHub Pages
-* Netlify
-* Vercel
-* CodePen
-
-Y después incrustarlo en Google Sites.
-
----
-
-```html
+html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -427,7 +408,7 @@ font-size:44px;
 </section>
 
 <section class="section">
-<div class="features">g
+<div class="features">
 
 <div class="feature-card">
 <h3>💖 Calidad Premium</h3>
@@ -589,7 +570,7 @@ font-size:44px;
 
 <div>
 <h3>Contacto</h3>
-<p>📱 WhatsApp: +52 55 1234 5678</p>
+<p>📱 WhatsApp: +52 5626248820</p>
 <p>📷 Instagram: @margeri.accesorios</p>
 <p>📍 México</p>
 </div>
@@ -713,8 +694,10 @@ card.style.display='none';
 
 function renderProductos(){
 
-
 const contenedor = document.querySelector('.products');
+
+if(!contenedor) return;
+
 contenedor.innerHTML='';
 
 productos.forEach((producto,index)=>{
@@ -733,12 +716,16 @@ contenedor.innerHTML += `
 </div>
 `;
 
+});
+
 const listaAdmin = document.getElementById('lista-admin-productos');
 
 if(listaAdmin){
+
 listaAdmin.innerHTML='';
 
 productos.forEach((p,i)=>{
+
 listaAdmin.innerHTML += `
 <div style="display:flex;justify-content:space-between;align-items:center;padding:15px;border:1px solid #eee;border-radius:15px;margin-bottom:15px;gap:15px;">
 <div style="display:flex;align-items:center;gap:15px;">
@@ -753,11 +740,10 @@ Eliminar
 </button>
 </div>
 `;
+
 });
+
 }
-
-
-});
 
 }
 
@@ -765,6 +751,8 @@ function agregarCarrito(index){
 
 carrito.push(productos[index]);
 actualizarCarrito();
+
+alert('Producto agregado al carrito');
 
 }
 
@@ -824,7 +812,18 @@ carritoBox.style.right = '-420px';
 carritoBox.classList.remove('abierto');
 }
 
+// LOGIN ADMIN FIREBASE
+
 async function loginAdminReal(){
+
+const correo = document.getElementById('adminEmail').value.trim();
+const password = document.getElementById('adminPassword').value.trim();
+
+if(!correo || !password){
+alert('Completa correo y contraseña');
+return;
+}
+
 
 const correo = document.getElementById('adminEmail').value;
 const password = document.getElementById('adminPassword').value;
@@ -932,6 +931,8 @@ await db.collection('productos').doc(index.toString()).set(productos[index]);
 
 async function cargarProductosFirebase(){
 
+try{
+
 const snapshot = await db.collection('productos').get();
 
 if(!snapshot.empty){
@@ -945,6 +946,11 @@ productos.push(doc.data());
 }
 
 renderProductos();
+
+}catch(error){
+console.error(error);
+renderProductos();
+}
 
 }
 
@@ -1034,32 +1040,3 @@ Agregar Producto
 
 </body>
 </html>
-```
-
----
-
-# Cómo publicarla
-
-## Opción rápida
-
-1. Ve a GitHub
-2. Crea un repositorio
-3. Sube el archivo `index.html`
-4. Activa GitHub Pages
-5. Copia el enlace
-6. Inserta el enlace en Google Sites
-
----
-
-# Resultado
-
-Obtendrás:
-
-* Página profesional
-* Diseño tipo Shopify
-* Responsive para celular
-* Animaciones suaves
-* WhatsApp flotante
-* Productos elegantes
-* Estilo premium rosa metálico
-* Compatible con Google Sites
