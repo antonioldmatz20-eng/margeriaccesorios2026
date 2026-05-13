@@ -1,4 +1,23 @@
-html
+# Margeri Accesorios — Página Completa Lista para Publicar
+
+Guarda este archivo como:
+
+```txt
+index.html
+```
+
+Luego puedes subirlo a:
+
+* GitHub Pages
+* Netlify
+* Vercel
+* CodePen
+
+Y después incrustarlo en Google Sites.
+
+---
+
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -408,7 +427,7 @@ font-size:44px;
 </section>
 
 <section class="section">
-<div class="features">
+<div class="features">g
 
 <div class="feature-card">
 <h3>💖 Calidad Premium</h3>
@@ -701,7 +720,7 @@ contenedor.innerHTML='';
 productos.forEach((producto,index)=>{
 
 contenedor.innerHTML += `
-<div class="product-card">
+<div class="product-card" data-categoria="${producto.categoria}">
 <div class="product-image">
 <div class="badge">TOP</div>
 <img src="${producto.imagen}">
@@ -713,6 +732,30 @@ contenedor.innerHTML += `
 </div>
 </div>
 `;
+
+const listaAdmin = document.getElementById('lista-admin-productos');
+
+if(listaAdmin){
+listaAdmin.innerHTML='';
+
+productos.forEach((p,i)=>{
+listaAdmin.innerHTML += `
+<div style="display:flex;justify-content:space-between;align-items:center;padding:15px;border:1px solid #eee;border-radius:15px;margin-bottom:15px;gap:15px;">
+<div style="display:flex;align-items:center;gap:15px;">
+<img src="${p.imagen}" style="width:70px;height:70px;object-fit:cover;border-radius:15px;">
+<div>
+<strong>${p.nombre}</strong><br>
+<span>$${p.precio} MXN</span>
+</div>
+</div>
+<button onclick="eliminarProductoAdmin(${i})" style="background:#ff4d6d;color:white;border:none;padding:12px 18px;border-radius:12px;cursor:pointer;">
+Eliminar
+</button>
+</div>
+`;
+});
+}
+
 
 });
 
@@ -765,8 +808,93 @@ function toggleCarrito(){
 
 const carritoBox = document.getElementById('carrito');
 
-if(carritoBox.style.right === '0px'){
+if(carritoBox.classList.contains('abierto')){
 carritoBox.style.right = '-420px';
+carritoBox.classList.remove('abierto');
+}else{
+carritoBox.style.right = '0px';
+carritoBox.classList.add('abierto');
+}
+
+}
+
+function cerrarCarrito(){
+const carritoBox = document.getElementById('carrito');
+carritoBox.style.right = '-420px';
+carritoBox.classList.remove('abierto');
+}
+
+async function loginAdminReal(){
+
+const correo = document.getElementById('adminEmail').value;
+const password = document.getElementById('adminPassword').value;
+
+try{
+
+await auth.signInWithEmailAndPassword(correo,password);
+
+document.getElementById('admin-login').style.display='none';
+document.getElementById('admin-panel-real').style.display='block';
+
+alert('Login correcto');
+
+}catch(error){
+alert('Error: ' + error.message);
+}
+
+}
+
+async function agregarNuevoProducto(){
+
+const nombre = document.getElementById('nuevoProductoNombre').value;
+const precio = document.getElementById('nuevoProductoPrecio').value;
+const categoria = document.getElementById('nuevoProductoCategoria').value;
+const archivo = document.getElementById('nuevoProductoImagen').files[0];
+
+if(!archivo){
+alert('Selecciona una imagen');
+return;
+}
+
+const storageRef = storage.ref('productos/' + Date.now() + '-' + archivo.name);
+
+await storageRef.put(archivo);
+
+const imageUrl = await storageRef.getDownloadURL();
+
+const producto = {
+nombre:nombre,
+precio:parseInt(precio),
+imagen:imageUrl,
+categoria:categoria
+};
+
+await db.collection('productos').add(producto);
+
+productos.push(producto);
+
+renderProductos();
+
+alert('Producto agregado correctamente');
+
+}
+
+async function eliminarProductoAdmin(index){
+
+productos.splice(index,1);
+
+const snapshot = await db.collection('productos').get();
+
+const docs = snapshot.docs;
+
+if(docs[index]){
+await db.collection('productos').doc(docs[index].id).delete();
+}
+
+renderProductos();
+
+alert('Producto eliminado');
+
 }else{
 carritoBox.style.right = '0px';
 }
@@ -836,7 +964,12 @@ renderProductos();
 
 <div id="carrito" style="position:fixed;top:0;right:-420px;width:400px;height:100vh;background:white;z-index:9999;box-shadow:-10px 0 30px rgba(0,0,0,.1);padding:30px;transition:.4s;overflow-y:auto;">
 
-<h2 style="margin-bottom:30px;font-family:'Playfair Display',serif;">Tu Carrito</h2>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+<h2 style="font-family:'Playfair Display',serif;">Tu Carrito</h2>
+<button onclick="cerrarCarrito()" style="background:#d97b93;color:white;border:none;padding:10px 14px;border-radius:12px;cursor:pointer;font-size:18px;">✕</button>
+</div>
+
+
 
 <div id="carrito-items"></div>
 
@@ -850,34 +983,50 @@ Finalizar Pedido
 
 </div>
 
-<section class="section" style="background:#fff5f8;display:none;" id="admin-section">
+<section class="section" style="background:#fff5f8;" id="admin-section">
 
-<h2 class="section-title">Panel de Administración</h2>
+<h2 class="section-title">Administrador</h2>
 
-<div style="max-width:700px;margin:auto;background:white;padding:40px;border-radius:30px;box-shadow:0 10px 30px rgba(0,0,0,.08);">
+<div id="admin-login" style="max-width:500px;margin:auto;background:white;padding:40px;border-radius:30px;box-shadow:0 10px 30px rgba(0,0,0,.08);">
 
-<label>Seleccionar producto</label>
-<select id="productoSelect" style="width:100%;padding:15px;border-radius:15px;border:1px solid #ddd;margin:10px 0 20px;">
-<option value="0">Collar Estrella</option>
-<option value="1">Aretes Perla</option>
-<option value="2">Pulsera Corazón</option>
+<h3 style="margin-bottom:20px;">Login Administrador</h3>
+
+<input id="adminEmail" type="email" placeholder="Correo administrador" style="width:100%;padding:15px;border-radius:15px;border:1px solid #ddd;margin-bottom:20px;">
+
+<input id="adminPassword" type="password" placeholder="Contraseña" style="width:100%;padding:15px;border-radius:15px;border:1px solid #ddd;margin-bottom:20px;">
+
+<button onclick="loginAdminReal()" class="btn btn-primary" style="border:none;cursor:pointer;">
+Iniciar Sesión
+</button>
+
+</div>
+
+<div id="admin-panel-real" style="display:none;max-width:900px;margin:40px auto 0;background:white;padding:40px;border-radius:30px;box-shadow:0 10px 30px rgba(0,0,0,.08);">
+
+<h3 style="margin-bottom:30px;">Agregar Nuevo Producto</h3>
+
+<input id="nuevoProductoNombre" type="text" placeholder="Nombre del producto" style="width:100%;padding:15px;border-radius:15px;border:1px solid #ddd;margin-bottom:20px;">
+
+<input id="nuevoProductoPrecio" type="number" placeholder="Precio" style="width:100%;padding:15px;border-radius:15px;border:1px solid #ddd;margin-bottom:20px;">
+
+<select id="nuevoProductoCategoria" style="width:100%;padding:15px;border-radius:15px;border:1px solid #ddd;margin-bottom:20px;">
+<option>Collares</option>
+<option>Pulseras</option>
+<option>Aretes</option>
+<option>Anillos</option>
 </select>
 
-<label>Nuevo nombre</label>
-<input id="nuevoNombre" type="text" placeholder="Nombre del producto" style="width:100%;padding:15px;border-radius:15px;border:1px solid #ddd;margin:10px 0 20px;">
+<input id="nuevoProductoImagen" type="file" accept="image/*" style="width:100%;padding:15px;border-radius:15px;border:1px solid #ddd;margin-bottom:20px;background:white;">
 
-<label>Nuevo precio</label>
-<input id="nuevoPrecio" type="number" placeholder="Precio" style="width:100%;padding:15px;border-radius:15px;border:1px solid #ddd;margin:10px 0 20px;">
-
-<label>Nueva imagen URL</label>
-<input id="nuevaImagen" type="text" placeholder="https://imagen.com/foto.jpg" style="width:100%;padding:15px;border-radius:15px;border:1px solid #ddd;margin:10px 0 20px;">
-
-<label>O subir imagen propia</label>
-<input id="subirImagen" type="file" accept="image/*" style="width:100%;padding:15px;border-radius:15px;border:1px solid #ddd;margin:10px 0 20px;background:white;">
-
-<button onclick="actualizarProducto()" class="btn btn-primary" style="border:none;cursor:pointer;">
-Guardar Cambios
+<button onclick="agregarNuevoProducto()" class="btn btn-primary" style="border:none;cursor:pointer;">
+Agregar Producto
 </button>
+
+<hr style="margin:40px 0;">
+
+<h3 style="margin-bottom:20px;">Eliminar Productos</h3>
+
+<div id="lista-admin-productos"></div>
 
 </div>
 
@@ -885,3 +1034,32 @@ Guardar Cambios
 
 </body>
 </html>
+```
+
+---
+
+# Cómo publicarla
+
+## Opción rápida
+
+1. Ve a GitHub
+2. Crea un repositorio
+3. Sube el archivo `index.html`
+4. Activa GitHub Pages
+5. Copia el enlace
+6. Inserta el enlace en Google Sites
+
+---
+
+# Resultado
+
+Obtendrás:
+
+* Página profesional
+* Diseño tipo Shopify
+* Responsive para celular
+* Animaciones suaves
+* WhatsApp flotante
+* Productos elegantes
+* Estilo premium rosa metálico
+* Compatible con Google Sites
